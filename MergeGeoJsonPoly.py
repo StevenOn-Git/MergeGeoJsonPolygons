@@ -10,6 +10,7 @@ import json
                  
     Version:
         -Original Release - Steve On 20240618
+        -Changed manual polygon association to for loop - Steve On 20240619
 """
 
 
@@ -50,18 +51,17 @@ def update_click_geometry_so(environment, key, geo_json_string):
 
 # VARIABLES
 ENV = "DEV"
-FILTER_1 = "$filter=(contains(Name_SO,'95828'))"
-FILTER_2 = "$filter=(contains(Name_SO,'95624'))"
-WORKING_AREA_NAME = "MS AREA 7"
-GEOMETRY_SO_KEY = 552411136
+zip_code_list = ['95832', '95758', '95757', '95690']
+WORKING_AREA_NAME = "MS AREA 8"
+GEOMETRY_SO_KEY = 552427520
 
 # MAIN
-# get working area polygons from click
-poly1 = gpd.GeoSeries([get_work_area_polygon(ENV, FILTER_1)])
-poly2 = gpd.GeoSeries([get_work_area_polygon(ENV, FILTER_2)])
+polygons = []
+for zip_code in zip_code_list:
+    # get working area polygons from click and append to polygons
+    polygons.append(gpd.GeoSeries([get_work_area_polygon(ENV, "$filter=(contains(Name_SO,'" + zip_code + "'))")])[0])
 
 # merge polygons together
-polygons = [poly1[0], poly2[0]]
 boundary = gpd.GeoSeries(unary_union(polygons))
 
 # convert merged polygon to json
